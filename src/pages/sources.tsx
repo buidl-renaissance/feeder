@@ -1,18 +1,18 @@
 import Head from "next/head";
 import Layout from "@/components/Layout";
-import FeedView from "@/components/Feed/FeedView";
+import SourceList from "@/components/Sources/SourceList";
 
-export default function Home() {
+export default function Sources() {
   return (
     <>
       <Head>
-        <title>Content Feeder</title>
-        <meta name="description" content="Content aggregation and processing platform" />
+        <title>Sources - Content Feeder</title>
+        <meta name="description" content="Manage content sources" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Layout currentPage="home">
-        <FeedView />
+      <Layout currentPage="sources">
+        <SourceList />
       </Layout>
     </>
   );

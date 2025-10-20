@@ -1,40 +1,194 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Content Feeder
+
+A full-stack content aggregation platform that ingests content from multiple sources (RSS, APIs, file uploads), processes it through AI/LLM pipelines and custom workflows, and presents it in user-facing feeds.
+
+## Features
+
+- **Multi-source Content Ingestion**: RSS feeds, API endpoints, and file uploads
+- **AI-Powered Processing**: Automatic summarization, tagging, and sentiment analysis
+- **Custom Workflows**: Build custom processing pipelines with visual workflow builder
+- **Real-time Feeds**: Filter, search, and view processed content
+- **Background Processing**: Automated content fetching and processing
+- **Modern UI**: Built with Next.js and styled-components
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React 19, TypeScript, styled-components
+- **Backend**: Next.js API routes, Drizzle ORM
+- **Database**: SQLite (local) / Turso (production)
+- **AI/LLM**: OpenAI GPT models
+- **Content Sources**: RSS parser, API integrations
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ 
+- Yarn package manager
+- OpenAI API key
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd feeder
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+yarn install
+```
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+3. Set up environment variables:
+```bash
+cp .env.local.example .env.local
+```
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+Edit `.env.local` and add your configuration:
+```env
+# Database (SQLite for local development)
+DATABASE_URL=file:./local.db
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+# OpenAI API Key (required for AI processing)
+OPENAI_API_KEY=your-openai-api-key
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Set up the database:
+```bash
+# Generate database migrations
+yarn db:generate
 
-## Learn More
+# Run migrations
+yarn db:migrate
+```
 
-To learn more about Next.js, take a look at the following resources:
+5. Start the development server:
+```bash
+yarn dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+Visit [http://localhost:3000](http://localhost:3000) to see the application.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Usage
 
-## Deploy on Vercel
+### Adding Sources
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Navigate to the Sources page
+2. Click "Add Source"
+3. Choose source type (RSS, API, or File)
+4. Configure the source with appropriate settings
+5. Enable the source to start automatic fetching
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+### Creating Workflows
+
+1. Go to the Workflows page
+2. Create custom processing workflows with steps like:
+   - AI Summarization
+   - AI Tagging
+   - Content Filtering
+   - Custom Transformations
+
+### Viewing Content
+
+The main feed displays all processed content with:
+- Filtering by source, status, and search terms
+- Real-time updates
+- AI-generated summaries and tags
+- Status indicators for processing state
+
+## API Endpoints
+
+### Sources
+- `GET /api/sources` - List all sources
+- `POST /api/sources` - Create a new source
+- `GET /api/sources/[id]` - Get source by ID
+- `PATCH /api/sources/[id]` - Update source
+- `DELETE /api/sources/[id]` - Delete source
+- `POST /api/sources/[id]/fetch` - Manually fetch from source
+
+### Content
+- `GET /api/content` - List content with filtering
+- `POST /api/content` - Create content manually
+- `GET /api/content/[id]` - Get content by ID
+- `PATCH /api/content/[id]` - Update content
+- `DELETE /api/content/[id]` - Delete content
+
+### Workflows
+- `GET /api/workflows` - List all workflows
+- `POST /api/workflows` - Create a new workflow
+- `GET /api/workflows/[id]` - Get workflow by ID
+- `PATCH /api/workflows/[id]` - Update workflow
+- `DELETE /api/workflows/[id]` - Delete workflow
+
+### Processing
+- `POST /api/process/[contentId]` - Process content through workflows
+
+## Database Schema
+
+The application uses the following main tables:
+
+- **sources**: Content source configurations
+- **content**: Aggregated content items
+- **workflows**: Processing workflow definitions
+- **processing_jobs**: Job execution tracking
+
+## Development
+
+### Database Management
+
+```bash
+# Generate migrations after schema changes
+yarn db:generate
+
+# Apply migrations
+yarn db:migrate
+
+# Open Drizzle Studio (database GUI)
+yarn db:studio
+```
+
+### Background Jobs
+
+The application includes a job scheduler that:
+- Fetches content from enabled sources every 5 minutes
+- Processes pending content through workflows every 2 minutes
+
+Jobs can be triggered manually via API endpoints.
+
+## Deployment
+
+### Environment Variables
+
+For production deployment, set these environment variables:
+
+```env
+# Database (use Turso for production)
+DATABASE_URL=libsql://your-database-url.turso.io
+DATABASE_AUTH_TOKEN=your-auth-token
+
+# OpenAI API Key
+OPENAI_API_KEY=your-openai-api-key
+```
+
+### Build and Deploy
+
+```bash
+# Build the application
+yarn build
+
+# Start production server
+yarn start
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details.

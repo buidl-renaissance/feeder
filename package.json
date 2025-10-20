@@ -4,22 +4,40 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev:full": "./scripts/dev-with-inngest.sh",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "inngest:dev": "inngest-cli dev",
+    "inngest:serve": "inngest-cli serve",
+    "test:inngest": "node scripts/test-inngest.js"
   },
   "dependencies": {
+    "@libsql/client": "^0.15.15",
+    "babel-plugin-styled-components": "^2.1.4",
+    "better-sqlite3": "^12.4.1",
+    "drizzle-kit": "^0.31.5",
+    "drizzle-orm": "^0.44.6",
+    "inngest": "^3.44.3",
+    "next": "15.5.6",
+    "openai": "^6.5.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "next": "15.5.6"
+    "rss-parser": "^3.13.0",
+    "styled-components": "^6.1.19",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.5.6",
-    "@eslint/eslintrc": "^3"
+    "inngest-cli": "^1.12.1",
+    "typescript": "^5"
   }
 }
