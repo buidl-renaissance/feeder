@@ -1,14 +1,17 @@
 # Content Feeder
 
-A full-stack content aggregation platform that ingests content from multiple sources (RSS, APIs, file uploads), processes it through AI/LLM pipelines and custom workflows, and presents it in user-facing feeds.
+A full-stack content aggregation platform that ingests content from multiple sources (RSS, APIs, file uploads, **event platforms**), processes it through AI/LLM pipelines and custom workflows, and presents it in user-facing feeds.
+
+📚 **[Full Documentation](wiki/README.md)**
 
 ## Features
 
-- **Multi-source Content Ingestion**: RSS feeds, API endpoints, and file uploads
+- **Multi-source Content Ingestion**: RSS feeds, API endpoints, file uploads, and event platforms
+- **Event Platform Integration**: Automatic polling from Luma, Meetup, and Resident Advisor
 - **AI-Powered Processing**: Automatic summarization, tagging, and sentiment analysis
 - **Custom Workflows**: Build custom processing pipelines with visual workflow builder
 - **Real-time Feeds**: Filter, search, and view processed content
-- **Background Processing**: Automated content fetching and processing
+- **Background Processing**: Automated content fetching via Inngest cron jobs
 - **Modern UI**: Built with Next.js and styled-components
 
 ## Tech Stack
@@ -16,8 +19,9 @@ A full-stack content aggregation platform that ingests content from multiple sou
 - **Frontend**: Next.js 15, React 19, TypeScript, styled-components
 - **Backend**: Next.js API routes, Drizzle ORM
 - **Database**: SQLite (local) / Turso (production)
+- **Background Jobs**: Inngest
 - **AI/LLM**: OpenAI GPT models
-- **Content Sources**: RSS parser, API integrations
+- **Content Sources**: RSS parser, Luma, Meetup, Resident Advisor APIs
 
 ## Getting Started
 
@@ -76,9 +80,17 @@ Visit [http://localhost:3000](http://localhost:3000) to see the application.
 
 1. Navigate to the Sources page
 2. Click "Add Source"
-3. Choose source type (RSS, API, or File)
+3. Choose source type:
+   - **RSS**: Subscribe to any RSS/Atom feed
+   - **API**: Connect to custom API endpoints
+   - **File**: Upload content files
+   - **Luma**: Poll events from lu.ma
+   - **Meetup**: Poll events from meetup.com
+   - **RA**: Poll events from Resident Advisor
 4. Configure the source with appropriate settings
 5. Enable the source to start automatic fetching
+
+For event sources, see [Event Sources Documentation](wiki/event-sources.md).
 
 ### Creating Workflows
 
@@ -150,11 +162,24 @@ yarn db:studio
 
 ### Background Jobs
 
-The application includes a job scheduler that:
-- Fetches content from enabled sources every 5 minutes
-- Processes pending content through workflows every 2 minutes
+The application uses Inngest for background job processing:
 
-Jobs can be triggered manually via API endpoints.
+- **Event Polling**: Polls Luma, Meetup, and RA sources every 2 hours
+- **Content Processing**: Processes pending content through workflows
+- **Source Refresh**: Respects per-source refresh rate settings
+
+To run background jobs locally:
+
+```bash
+# Start Next.js + Inngest together
+yarn dev:full
+
+# Or run separately
+yarn dev          # Terminal 1
+yarn inngest:dev  # Terminal 2
+```
+
+Jobs can be triggered manually via API endpoints or the Inngest dashboard.
 
 ## Deployment
 
@@ -169,6 +194,14 @@ DATABASE_AUTH_TOKEN=your-auth-token
 
 # OpenAI API Key
 OPENAI_API_KEY=your-openai-api-key
+
+# Inngest (for background jobs)
+INNGEST_EVENT_KEY=your-event-key
+INNGEST_SIGNING_KEY=your-signing-key
+
+# Event Source APIs (optional, for authenticated access)
+LUMA_API_KEY=your-luma-api-key
+MEETUP_API_KEY=your-meetup-oauth-token
 ```
 
 ### Build and Deploy
