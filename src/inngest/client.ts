@@ -1,14 +1,10 @@
 import { Inngest } from 'inngest';
 
-// Create a client to send and receive events
 export const inngest = new Inngest({ 
   id: 'content-feeder',
   name: 'Content Feeder',
-  // For local development, no API key needed
-  // In production, you'd add: eventKey: process.env.INNGEST_EVENT_KEY
 });
 
-// Type definitions for our events
 export type Events = {
   'source/fetch': {
     data: {
@@ -33,7 +29,14 @@ export type Events = {
   'source/schedule': {
     data: {
       sourceId: string;
-      refreshRate: number; // minutes
+      refreshRate: number;
+    };
+  };
+  'event/poll': {
+    data: {
+      sourceId?: string;
+      sourceType?: 'LUMA' | 'MEETUP' | 'RA';
+      forceRefresh?: boolean;
     };
   };
 };

@@ -3,10 +3,6 @@ import { content } from '@/db/schema';
 import { and, eq, or } from 'drizzle-orm';
 import { ContentObject } from '@/types/content';
 
-/**
- * Check if content already exists based on multiple criteria
- * This prevents duplicate content from being stored
- */
 export async function checkForDuplicateContent(
   newContent: Partial<ContentObject>
 ): Promise<boolean> {
@@ -14,10 +10,13 @@ export async function checkForDuplicateContent(
     return false;
   }
 
-  // Create multiple conditions to check for duplicates
   const conditions = [];
 
-  // Check by title and source (most common case)
+  const externalId = newContent.metadata?.externalId;
+  if (externalId) {
+    conditions.push(eq(content.externalId, externalId));
+  }
+
   conditions.push(
     and(
       eq(content.title, newContent.title),
@@ -25,7 +24,6 @@ export async function checkForDuplicateContent(
     )
   );
 
-  // If URL exists, also check by URL and source
   if (newContent.url) {
     conditions.push(
       and(
@@ -35,7 +33,6 @@ export async function checkForDuplicateContent(
     );
   }
 
-  // Check for same title across different sources (to avoid cross-source duplicates)
   if (newContent.url) {
     conditions.push(
       and(
@@ -45,7 +42,6 @@ export async function checkForDuplicateContent(
     );
   }
 
-  // Query the database for any matches
   const existingContent = await db
     .select()
     .from(content)
@@ -55,28 +51,35 @@ export async function checkForDuplicateContent(
   return existingContent.length > 0;
 }
 
-/**
- * Create content with duplicate prevention
- * Returns the content if created, or existing content if duplicate found
- */
 export async function createContentWithDuplicatePrevention(
   contentData: Omit<ContentObject, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<{ created: boolean; content: ContentObject }> {
-  // Check for duplicates first
   const isDuplicate = await checkForDuplicateContent(contentData);
   
   if (isDuplicate) {
-    // Return existing content
-    const existingContent = await db
-      .select()
-      .from(content)
-      .where(
-        and(
-          eq(content.title, contentData.title),
-          eq(content.sourceId, contentData.sourceId)
+    const externalId = contentData.metadata?.externalId;
+    
+    let existingContent;
+    if (externalId) {
+      existingContent = await db
+        .select()
+        .from(content)
+        .where(eq(content.externalId, externalId))
+        .limit(1);
+    }
+    
+    if (!existingContent || existingContent.length === 0) {
+      existingContent = await db
+        .select()
+        .from(content)
+        .where(
+          and(
+            eq(content.title, contentData.title),
+            eq(content.sourceId, contentData.sourceId)
+          )
         )
-      )
-      .limit(1);
+        .limit(1);
+    }
     
     return {
       created: false,
@@ -84,15 +87,17 @@ export async function createContentWithDuplicatePrevention(
     };
   }
 
-  // Create new content
+  const externalId = contentData.metadata?.externalId;
+  
   const newContent = {
     id: `${contentData.sourceId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     ...contentData,
+    externalId: externalId || undefined,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
 
-  const result = await db.insert(content).values(newContent).returning();
+  const result = await db.insert(content).values(newContent as any).returning();
   
   return {
     created: true,
