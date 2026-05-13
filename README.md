@@ -2,6 +2,8 @@
 
 A full-stack content aggregation platform that ingests content from multiple sources (RSS, APIs, file uploads), processes it through AI/LLM pipelines and custom workflows, and presents it in user-facing feeds.
 
+**[📖 Wiki Documentation](./wiki/README.md)** — Architecture, features, and development guides
+
 ## Features
 
 - **Multi-source Content Ingestion**: RSS feeds, API endpoints, and file uploads
