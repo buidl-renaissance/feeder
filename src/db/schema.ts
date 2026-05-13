@@ -3,7 +3,7 @@ import { sql } from 'drizzle-orm';
 
 export const sources = sqliteTable('sources', {
   id: text('id').primaryKey(),
-  type: text('type', { enum: ['RSS', 'YOUTUBE', 'API', 'FILE'] }).notNull(),
+  type: text('type', { enum: ['RSS', 'YOUTUBE', 'API', 'FILE', 'LUMA', 'MEETUP', 'RA'] }).notNull(),
   name: text('name').notNull(),
   url: text('url'),
   config: text('config', { mode: 'json' }).$type<Record<string, any>>(),
@@ -11,6 +11,8 @@ export const sources = sqliteTable('sources', {
   refreshRate: integer('refresh_rate').default(10), // minutes, default 10
   lastFetchedAt: integer('last_fetched_at', { mode: 'timestamp' }),
   lastFetchAttempt: integer('last_fetch_attempt', { mode: 'timestamp' }),
+  lastError: text('last_error'),
+  consecutiveFailures: integer('consecutive_failures').default(0),
   createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),
 });
@@ -18,7 +20,7 @@ export const sources = sqliteTable('sources', {
 export const content = sqliteTable('content', {
   id: text('id').primaryKey(),
   sourceId: text('source_id').notNull().references(() => sources.id),
-  sourceType: text('source_type', { enum: ['RSS', 'YOUTUBE', 'API', 'FILE'] }).notNull(),
+  sourceType: text('source_type', { enum: ['RSS', 'YOUTUBE', 'API', 'FILE', 'LUMA', 'MEETUP', 'RA'] }).notNull(),
   title: text('title').notNull(),
   description: text('description'),
   url: text('url'),
@@ -27,6 +29,7 @@ export const content = sqliteTable('content', {
   metadata: text('metadata', { mode: 'json' }).$type<Record<string, any>>(),
   status: text('status', { enum: ['PENDING', 'PROCESSING', 'COMPLETED', 'FAILED'] }).default('PENDING'),
   publishedAt: integer('published_at', { mode: 'timestamp' }),
+  externalId: text('external_id'),
   createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),
 });

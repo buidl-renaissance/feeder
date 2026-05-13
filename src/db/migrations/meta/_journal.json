@@ -22,6 +22,13 @@
       "when": 1760930385287,
       "tag": "0002_omniscient_thunderbolt",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1778643392580,
+      "tag": "0003_worthless_doomsday",
+      "breakpoints": true
     }
   ]
 }
