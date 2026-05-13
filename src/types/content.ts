@@ -3,6 +3,9 @@ export enum SourceType {
   YOUTUBE = 'YOUTUBE',
   API = 'API',
   FILE = 'FILE',
+  LUMA = 'LUMA',
+  MEETUP = 'MEETUP',
+  RA = 'RA',
 }
 
 export enum ProcessingStatus {
@@ -85,4 +88,60 @@ export interface FileUploadConfig {
   allowedTypes: string[];
   maxSize: number;
   transform?: string; // JavaScript function as string
+}
+
+export interface EventObject {
+  externalId: string;
+  title: string;
+  description?: string;
+  url: string;
+  imageUrl?: string;
+  startTime: Date;
+  endTime?: Date;
+  timezone?: string;
+  venue?: {
+    name: string;
+    address?: string;
+    city?: string;
+    country?: string;
+    latitude?: number;
+    longitude?: number;
+  };
+  organizer?: {
+    name: string;
+    url?: string;
+  };
+  categories?: string[];
+  ticketUrl?: string;
+  price?: {
+    min?: number;
+    max?: number;
+    currency?: string;
+    isFree?: boolean;
+  };
+  capacity?: number;
+  rsvpCount?: number;
+  source: SourceType;
+  rawData?: Record<string, any>;
+}
+
+export interface LumaConfig {
+  calendarId?: string;
+  username?: string;
+  apiKey?: string;
+  city?: string;
+}
+
+export interface MeetupConfig {
+  groupUrlname?: string;
+  topicCategory?: string;
+  city?: string;
+  radius?: number;
+  apiKey?: string;
+}
+
+export interface RAConfig {
+  areaId?: string;
+  clubId?: string;
+  city?: string;
 }
